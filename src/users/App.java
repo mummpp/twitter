@@ -121,7 +121,11 @@ public class App {
         user.addTweet(new Tweet(newTweet));
         succeedLogIn(user);
     }
-    private void viewMyTweets(User user){}
+
+    private void viewMyTweets(User user){
+
+
+    }
     private void viewAllTweets(User user){}
     private void viewFollowers(User user){}
     private void viewFollowings(User user){}
@@ -137,7 +141,6 @@ public class App {
                 case 2:twitter.userLogIn();break;
                 default:System.out.println("Select valid number from the list");break;
             }
-
         }
         }
         catch (Exception e){
