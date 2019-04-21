@@ -2,7 +2,7 @@ package users;
 
 public enum LoggedInMenu {
 
-    Go_Back_to_Previous_Menu,
+    Log_Out,
     Post_New_Tweet,
     List_My_Tweets,
     List_All_Tweets,

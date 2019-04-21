@@ -2,6 +2,8 @@ package users;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
+import java.util.stream.Collectors;
 
 public class User {
 
@@ -33,7 +35,7 @@ public class User {
 
     protected void addTweet(Tweet tweet){
         tweet.setUserId(this.userId);
-        tweet.setTweetId(this.tweets.size()+1);
+        tweet.setTweetId(RandomID.getID());
         this.tweets.add(tweet);
     }
 
@@ -62,6 +64,7 @@ public class User {
 
     protected void addFollowing(User user){
         this.followings.add(user);
+        user.followers.add(this);
     }
     private User findByUserId(List<User> users, int id) {
         return users
@@ -86,6 +89,20 @@ public class User {
 
         User user = (User) obj;
         return user.getUserId() == this.userId;
+    }
+
+    static class RandomID {
+        private RandomID(){}
+
+        static final List<Integer>  numbers = new Random(1000).ints(0,350).limit(100)
+                .boxed()
+                .distinct()
+                .collect(Collectors.toList());
+        static int i=-1;
+        public static int getID(){
+            return numbers.get(++i);
+        }
+
     }
 
 }

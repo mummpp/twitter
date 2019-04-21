@@ -162,6 +162,9 @@ public class App {
         user.getTweets().stream()
                 .sorted(Comparator.comparing(Tweet::getDate).reversed())
                 .forEach(Tweet::print);
+
+        System.out.println();
+
         succeedLogIn(user);
 
     }
@@ -186,6 +189,7 @@ public class App {
         drawLine();
         user.getFollowers().forEach(User::print);
         drawLine();
+
         succeedLogIn(user);
     }
 
@@ -260,6 +264,10 @@ public class App {
         } finally {
             scan.close();
         }
+
     }
+
+
+
 
 }
