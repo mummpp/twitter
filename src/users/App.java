@@ -15,6 +15,7 @@ public class App {
 
     }
     private int getStart(){
+        System.out.println("-------------------------------------------");
         System.out.println("Enter a number as indicated below:\n" +
                 "Number\tAction\n-----+-------------------------");
         mainMenuList();
@@ -24,8 +25,8 @@ public class App {
         int i=0;
         for(EntryMenu em: EntryMenu.values()) {
             System.out.println(Integer.toString(i++)+" >>\t"+em);
-            System.out.println("-------------------------------------------\n>>");
         }
+        System.out.println("-------------------------------------------\n>>");
     }
 
     private void loggedInMenuList(){
@@ -112,7 +113,14 @@ public class App {
             default:System.out.println("Select valid number from the list");succeedLogIn(user);
         }
     }
-    private void addTweet(User user){}
+    private void addTweet(User user){
+        scan.nextLine();
+        System.out.print("Type your tweet here:\t");
+        String newTweet=scan.nextLine();
+        System.out.println(String.format("Your new tweet, \"%s\" is added",newTweet));
+        user.addTweet(new Tweet(newTweet));
+        succeedLogIn(user);
+    }
     private void viewMyTweets(User user){}
     private void viewAllTweets(User user){}
     private void viewFollowers(User user){}
