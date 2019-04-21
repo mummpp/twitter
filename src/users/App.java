@@ -10,13 +10,23 @@ public class App {
 
     public App(){
         userList=new ArrayList<>();
-        System.out.println("---------Welcome to MUM.TWITTER-----------");
+        System.out.println("----------Welcome to MUM.TWITTER------------");
         scan=new Scanner(System.in);
 
     }
+    private void drawLine(){
+        System.out.println("--------------------------------------------");
+    }
+    private void viewTweetBar(){
+        drawLine();
+        System.out.println("Date#\t\tTweet#\tTweet\tComments#\tLikes#");
+        drawLine();
+    }
     private int getStart(){
+        drawLine();
         System.out.println("Enter a number as indicated below:\n" +
-                "Number\tAction\n-----+-------------------------");
+                "Number\tAction");
+        drawLine();
         mainMenuList();
         return scan.nextInt();
     }
@@ -24,8 +34,9 @@ public class App {
         int i=0;
         for(EntryMenu em: EntryMenu.values()) {
             System.out.println(Integer.toString(i++)+" >>\t"+em);
-            System.out.println("-------------------------------------------\n>>");
         }
+        drawLine();
+        System.out.println(">>");
     }
 
     private void loggedInMenuList(){
@@ -33,8 +44,8 @@ public class App {
         for(LoggedInMenu lm: LoggedInMenu.values()) {
             System.out.println(Integer.toString((i==EntryMenu.values().length-1)?0:i)+" >>\t"+lm);
             i++;
-        }
-        System.out.println("-------------------------------------------\n>>");
+        }drawLine();
+        System.out.println(">>");
     }
     private boolean checkIfUserNameAlreadyExists(String userName){
         return userList.stream().anyMatch(user -> user.getUserName().equals(userName));
@@ -64,14 +75,14 @@ public class App {
             System.out.println("User name already exists.\nEnter new User Name\n" +
                     "(or enter 'x' to return to main menu\n");
             userRegInfo[0]=(scan.nextLine());
-//            if(Integer.parseInt(userRegInfo[0])==120)
-//                return;
+
         }
         System.out.println(">>\tEnter PassWord");
         userRegInfo[1]=(scan.nextLine());
         //return userRegInfo;
         userList.add(new User(userRegInfo[0],userRegInfo[1],userList.size()+1));
-        System.out.println("User Registration Successful\n----------------------------");
+        System.out.println("User Registration Successful");
+        drawLine();
     }
 
     private void userLogIn(){
@@ -89,14 +100,15 @@ public class App {
         }
     }
 
+
     private void succeedLogIn(User user){
-        System.out.println("UserName\tFollowing#\tFollower#\tTweets#" +
-                "\n------+-------------------------------------");
+        System.out.println("Profile Summary\nUserName\tFollowing#\tFollower#\tTweets#");
+        drawLine();
         System.out.println(user.getUserName()+"\t\t"+user.getFollowings().size()+"\t\t\t"+
-                user.getFollowers().size()+"\t\t\t"+user.getTweets().size()+
-                "\n--------------------------------------------");
-        System.out.println("Enter a number as indicated below:\n" +
-                "Number\tAction\n------+----------------------------");
+                user.getFollowers().size()+"\t\t\t"+user.getTweets().size());
+        drawLine();
+        System.out.println("Enter a number as indicated below:\nNumber\tAction");
+        drawLine();
         loggedInMenuList();
         int userInput=scan.nextInt();
         switch (userInput){
@@ -112,9 +124,35 @@ public class App {
             default:System.out.println("Select valid number from the list");succeedLogIn(user);
         }
     }
-    private void addTweet(User user){}
-    private void viewMyTweets(User user){}
-    private void viewAllTweets(User user){}
+    private void addTweet(User user){
+        scan.nextLine();
+        System.out.print("Type your tweet here:\t");
+        String newTweet=scan.nextLine();
+        System.out.println(String.format("Your new tweet, \"%s\" is added",newTweet));
+        user.addTweet(new Tweet(newTweet));
+        succeedLogIn(user);
+    }
+
+    private void viewMyTweets(User user){
+        viewTweetBar();
+        user.getTweets().stream()
+                .sorted(Comparator.comparing(Tweet::getDate))
+                .forEach(Tweet::print);
+        succeedLogIn(user);
+
+    }
+    private void viewAllTweets(User user){
+        List<User> userAndItsFollowings=new ArrayList<>();
+        userAndItsFollowings.add(user);
+        userAndItsFollowings.addAll(user.getFollowings());
+        //userAndItsFollowings.forEach(this::viewMyTweets);
+        viewTweetBar();
+        userAndItsFollowings.stream()
+                .flatMap(u->u.getTweets().stream())
+                .sorted(Comparator.comparing(Tweet::getDate))
+                .forEach(Tweet::print);
+        succeedLogIn(user);
+    }
     private void viewFollowers(User user){}
     private void viewFollowings(User user){}
     private void viewRecommendation(User user){}
@@ -129,7 +167,6 @@ public class App {
                 case 2:twitter.userLogIn();break;
                 default:System.out.println("Select valid number from the list");break;
             }
-
         }
         }
         catch (Exception e){
