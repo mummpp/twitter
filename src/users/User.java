@@ -2,8 +2,6 @@ package users;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
-import java.util.Random;
 
 public class User {
 
@@ -24,19 +22,70 @@ public class User {
 
     }
 
-    public String getUserName() {return userName;}
-    public String getPassword() {return password;}
-    public int getUserId() {return userId;}
-    public List<User> getFollowers() {return followers;}
-    public List<User> getFollowings() {return followings;}
-    public List<Tweet> getTweets() {return tweets;}
+    protected String getUserName() {return userName;}
+    protected String getPassword() {return password;}
+    protected int getUserId() {return userId;}
+    protected List<User> getFollowers() {return followers;}
+    protected List<User> getFollowings() {return followings;}
+    protected List<Tweet> getTweets() {return tweets;}
     @Override
     public String toString(){return this.userId+" "+this.userName;}
 
-    public void addTweet(Tweet tweet){
+    protected void addTweet(Tweet tweet){
         tweet.setUserId(this.userId);
         tweet.setTweetId(this.tweets.size()+1);
         this.tweets.add(tweet);
+    }
+
+    protected void addFollower(User user) {
+        if (getFollower(user) != null) {
+            System.out.println("This user is already following you.");
+            return;
+        }
+        this.followers.add(user);
+    }
+
+    protected void removeFollower(User user){
+        if (getFollower(user) == null) {
+            System.out.println("This user is not following you.");
+            return;
+        }
+
+        followers.remove(user);
+    }
+
+    private User getFollower(User user) {
+        return followers
+                .stream()
+                .reduce(null, (accum, user2) -> user2.getUserId() == user.getUserId() ? user2 : accum);
+    }
+
+    protected void addFollowing(User user){
+        this.followings.add(user);
+    }
+    private User findByUserId(List<User> users, int id) {
+        return users
+                .stream()
+                .reduce(null, (accum, user) -> user.getUserId() == id ? user : accum);
+    }
+
+    protected void print() {
+        System.out.println(userId + "\t" + userName + "\t" + followings.size() +
+                "\t" + followers.size() + "\t" + tweets.size());
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+
+        User user = (User) obj;
+        return user.getUserId() == this.userId;
     }
 
 }
