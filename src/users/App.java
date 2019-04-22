@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 
 
 public class App {
+
     private static Scanner scan;
     private List<User> userList;
 
@@ -31,23 +32,6 @@ public class App {
         return scan.nextInt();
     }
 
-    private boolean checkIfUserNameAlreadyExists(String userName) {
-        return userList.stream().anyMatch(user -> user.getUserName().equals(userName));
-    }
-
-    private boolean checkIfUserExists(String userName, String userPassword) {
-        return checkIfUserNameAlreadyExists(userName) && userList.stream()
-                .anyMatch(user -> user.getPassword().equals(userPassword));
-    }
-
-    private User getUser(String userName, String userPassword) {
-        return checkIfUserExists(userName, userPassword) ? userList.stream()
-                .filter(user -> user.getUserName().equals(userName) && user.getPassword().equals(userPassword))
-                .collect(Collectors.toList()).get(0) : new User("temp", "temp", 0);
-
-
-    }
-
     private /*List<String>*/ void userRegister() {
         String[] userRegInfo = new String[2];
         scan.nextLine();
@@ -55,30 +39,31 @@ public class App {
         userRegInfo[0] = (scan.nextLine());
 
         //check if the username is already taken
-        while (new UserValidate(userList).test(userRegInfo[0])) {
+        while (UserValidate.checkUserName.apply(userList,userRegInfo[0])){
             System.out.println("User name already exists.\nEnter new User Name\n" +
                     "(or enter 'x' to return to main menu\n");
             userRegInfo[0] = (scan.nextLine());
         }
         System.out.println(">>\tEnter PassWord");
         userRegInfo[1] = (scan.nextLine());
-        //return userRegInfo;
-        userList.add(new User(userRegInfo[0], userRegInfo[1], userList.size() + 1));
+        userList.add(UserValidate.createUser.apply(userList,userRegInfo));
         System.out.println("User Registration Successful");
         drawLine();
     }
 
     private void userLogIn() {
         scan.nextLine();
+        String[] userInfo = new String[2];
         System.out.println(">>\tEnter UserName");
-        String userName = (scan.nextLine());
+        userInfo[0] = (scan.nextLine());
         System.out.println(">>\tEnter PassWord");
-        String userPassword = (scan.nextLine());
-        if (!new UserValidate(userList).test(userName,userPassword))//(!checkIfUserExists(userName, userPassword)) {
+        userInfo[1] = (scan.nextLine());
+        User loggingUser=UserValidate.getUser.apply(userList,userInfo);
+        if (loggingUser==null)
             System.out.println("User name and/or password provided does not match with record");
         else {
             System.out.println("\nLog-in Successful\n");
-            succeedLogIn(getUser(userName, userPassword));
+            succeedLogIn(loggingUser);
         }
     }
 
@@ -130,8 +115,8 @@ public class App {
         scan.nextLine();
         System.out.print("Type your tweet here:\t");
         String newTweet = scan.nextLine();
-        System.out.println(String.format("Your new tweet, \"%s\" is added", newTweet));
         user.addTweet(new Tweet(newTweet));
+        System.out.println(String.format("Your new tweet, \"%s\" is added", newTweet));
         succeedLogIn(user);
 
     }
@@ -315,6 +300,7 @@ public class App {
 
     public static void main(String[] args) {
         App twitter = new App();
+
         try {
             while (true) {
                 int initValue = twitter.getStart();
