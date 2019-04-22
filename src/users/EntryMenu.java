@@ -1,6 +1,6 @@
 package users;
 
-public enum EntryMenu {
+public enum EntryMenu{
     ExitApp,
     UserRegister,
     UserLogIn

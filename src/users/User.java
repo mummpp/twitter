@@ -14,7 +14,11 @@ public class User {
     private List<User> followings;
     private List<Tweet> tweets;
 
-    public User(String userName, String password, int id) {
+    protected User(){
+
+    }
+
+    protected User(String userName, String password, int id) {
         this.userName = userName;
         this.password = password;
         this.userId= id;
@@ -35,8 +39,15 @@ public class User {
 
     protected void addTweet(Tweet tweet){
         tweet.setUserId(this.userId);
+        tweet.setUser(this);
         tweet.setTweetId(RandomID.getID());
         this.tweets.add(tweet);
+    }
+    protected void addRetweet(Tweet reTweet){
+        reTweet.setUserId(this.userId);
+        reTweet.setUser(this);
+        reTweet.addRetweet(reTweet);
+        this.tweets.add(reTweet);
     }
 
     protected void addFollower(User user) {
@@ -71,6 +82,7 @@ public class User {
                 .stream()
                 .reduce(null, (accum, user) -> user.getUserId() == id ? user : accum);
     }
+
 
     protected void print() {
         System.out.println(userId + "\t" + userName + "\t" + followings.size() +

@@ -1,8 +1,7 @@
 package users;
 
-public enum LoggedInMenu {
-
-    Log_Out,
+public enum LoggedInMenu{
+    Go_Back,
     Post_New_Tweet,
     List_My_Tweets,
     List_All_Tweets,
@@ -10,5 +9,4 @@ public enum LoggedInMenu {
     List_of_Followings,
     List_Some_Recommendation_to_Follow,
     Follow_Some_User
-
 }

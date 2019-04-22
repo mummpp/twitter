@@ -1,9 +1,9 @@
 package users;
 
 public class Like {
-    int count;
+    int userID;
 
-    public Like(int count) {
-        this.count = count;
+    public Like(int userID) {
+        this.userID = userID;
     }
 }

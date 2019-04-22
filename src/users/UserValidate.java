@@ -13,8 +13,9 @@ public class UserValidate implements Predicate<String> {
         return this.users.stream()
                 .reduce(null,(accum, user)-> user.getUserName().equals(username) ? user : accum) != null;
     }
-    public boolean test(String username,String Password){
+    public boolean test(String username,String password){
         return this.users.stream()
-                .reduce(null,(accum, user)-> user.getUserName().equals(username) ? user : accum) != null;
+                .reduce(null,(accum, user)-> user.getUserName().equals(username) &&
+                        user.getPassword().equals(password)? user : accum) != null;
     }
 }
