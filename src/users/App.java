@@ -2,33 +2,28 @@ package users;
 
 import java.util.*;
 import java.util.function.BiFunction;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 
 public class App {
 
     private static Scanner scan;
-    private List<User> userList;
+    private static List<User> userList;
 
     App() {
         userList = new ArrayList<>();
-        System.out.println("-------------Welcome to MUM.TWITTER---------------");
+        UiFormat.welcome.draw();
         scan = new Scanner(System.in);
 
     }
-    private void viewTweetBar() {
-        drawLine();
-        System.out.println("Date#\t\tTweet#\tTweet\tComments#\tLikes#");
-        drawLine();
+
+    public static List<User> getUserList() {
+        return userList;
     }
 
     private int getStart() {
-        drawLine();
-        System.out.println("Enter a number as indicated below:\n" +
-                "Number\tAction");
-        drawLine();
-        entryMenuList();
+        UiFormat.startBar.accept(1);
+        //entryMenuList();
         return scan.nextInt();
     }
 
@@ -48,7 +43,7 @@ public class App {
         userRegInfo[1] = (scan.nextLine());
         userList.add(UserValidate.createUser.apply(userList,userRegInfo));
         System.out.println("User Registration Successful");
-        drawLine();
+        UiFormat.drawLine.draw();
     }
 
     private void userLogIn() {
@@ -69,14 +64,13 @@ public class App {
 
     private void succeedLogIn(User user) {
         System.out.println("My Profile Summary\nUserID#\tUserName\tFollowing#\tFollower#\tTweets#");
-        drawLine();
+        UiFormat.drawLine.draw();
         user.print();
-//        System.out.println(user.getUserId()+"\t"+user.getUserName() + "\t\t" + user.getFollowings().size() + "\t\t\t" +
-//                user.getFollowers().size() + "\t\t\t" + user.getTweets().size());
-        drawLine();
-        System.out.println("Enter a number as indicated below:\nNumber\tAction");
-        drawLine();
-        logInMenuList();
+//        drawLine();
+//        System.out.println("Enter a number as indicated below:\nNumber\tAction");
+//        drawLine();
+//        logInMenuList();
+        UiFormat.startBar.accept(2);
         int userInput = scan.nextInt();
         switch (userInput) {
             //Need to re-arrange case numbers according to order of
@@ -122,18 +116,13 @@ public class App {
     }
 
     private void viewMyTweets(User user) {
-        viewTweetBar();
-        user.getTweets().stream()
-                .sorted(Comparator.comparing(Tweet::getDate).reversed())
-                .forEach(Tweet::print);
+        TweetValidate.viewTweets.accept(user);
         reactionOnTweet(user);
         succeedLogIn(user);
 
     }
     private void reactionOnTweet(User user){
-        drawLine();
-        System.out.println("Your action on any of above tweet(s):\nNumber\tAction");
-        tweetMenuList();
+        UiFormat.startBar.accept(3);
         int userInput = scan.nextInt();
         switch (userInput) {
             //Need to re-arrange case numbers according to order of
@@ -161,16 +150,13 @@ public class App {
                 reactionOnTweet(user);
         }
     }
-    Function<User,List<User>> getUserAndItsFollowings=user -> {
+
+
+    private BiFunction<Integer, User, Tweet> validateTweet=(tweetID, user)->{
+        //List<User> userAndItsFollowings = UserValidate.getUserAndItsFollowings.apply(user);
         List<User> userAndItsFollowings = new ArrayList<>();
         userAndItsFollowings.add(user);
         userAndItsFollowings.addAll(user.getFollowings());
-        return userAndItsFollowings;
-
-    };
-
-    private BiFunction<Integer, User, Tweet> validateTweet=(tweetID, user)->{
-        List<User> userAndItsFollowings = getUserAndItsFollowings.apply(user);
         return userAndItsFollowings.stream()
                 .flatMap(u -> u.getTweets().stream())
                 .filter(tweet -> tweet.getTweetId()==tweetID)
@@ -179,7 +165,7 @@ public class App {
 
     //return tweet from tweet-id
     private Tweet getTweetFromID(User user){
-        drawLine();
+        UiFormat.drawLine.draw();
         System.out.println("Enter tweet ID as listed under column:Tweet#");
         int userInput=scan.nextInt();
         if(userInput==0)
@@ -208,6 +194,7 @@ public class App {
             String reply = scan.nextLine();
             tweet.addReply(reply,user.getUserId());
         }
+        succeedLogIn(user);
     }
     private void likeTweet(User user){
         Tweet tweet=getTweetFromID(user);
@@ -217,7 +204,10 @@ public class App {
     }
     private void unlikeTweet(User user){
         Tweet tweet=getTweetFromID(user);
-        List<User> userAndItsFollowings = getUserAndItsFollowings.apply(user);
+        List<User> userAndItsFollowings = new ArrayList<>();
+        userAndItsFollowings.add(user);
+        userAndItsFollowings.addAll(user.getFollowings());
+        //List<User> userAndItsFollowings = UserValidate.getUserAndItsFollowings.apply(user);
         if(userAndItsFollowings.stream().filter(u -> u.getTweets().contains(tweet)).count()>0)
                 tweet.removeLikeOnThisTweet(user.getUserId());
     }
@@ -233,45 +223,23 @@ public class App {
         List<User> userAndItsFollowings = new ArrayList<>();
         userAndItsFollowings.add(user);
         userAndItsFollowings.addAll(user.getFollowings());
-        //userAndItsFollowings.forEach(this::viewMyTweets);
-        viewTweetBar();
-        userAndItsFollowings.stream()
-                .flatMap(u -> u.getTweets().stream())
-                .sorted(Comparator.comparing(Tweet::getDate).reversed())
-                .forEach(Tweet::print);
+        TweetValidate.viewAllTweets.accept(userAndItsFollowings);
         reactionOnTweet(user);
         succeedLogIn(user);
     }
 
     private void viewFollowers(User user) {
-        System.out.println("List of Followers:");
-        System.out.println("Profile Summary\nUserID#\tUserName\tFollowing#\tFollower#\tTweets#");
-        drawLine();
-        user.getFollowers().forEach(User::print);
-        drawLine();
+        UserValidate.showFollowers.accept(user);
         succeedLogIn(user);
     }
 
     private void viewFollowings(User user) {
-        System.out.println("List of Followings:");
-        System.out.println("Profile Summary\nUserID#\tUserName\tFollowing#\tFollower#\tTweets#");
-        drawLine();
-        user.getFollowings().forEach(User::print);
-        drawLine();
+        UserValidate.showFollowings.accept(user);
         succeedLogIn(user);
     }
     //get 5 recommendation to follow
     private void viewRecommendation(User user) {
-        System.out.println("Some Recommendations for you to follow:");
-        drawLine();
-        System.out.println("UserID#\tUserName\tFollowing#\tFollower#\tTweets#");
-        drawLine();
-        userList.stream()
-                .filter(user1 -> !user.equals(user1)&&!user.getFollowings().contains(user1))
-                .distinct()
-                .limit(5)
-                .forEach(User::print);
-        drawLine();
+        UserValidate.showRecommendation.accept(userList,user);
         succeedLogIn(user);
     }
 
@@ -279,23 +247,11 @@ public class App {
         System.out.println("Enter User ID you want to follow:");
         int id=scan.nextInt();
         System.out.println("You entered "+id);
-        User userToFollow=findByUserId(extractedUserList.apply(userList,user),id);
+        User userToFollow=UserValidate.findByUserId.apply(UserValidate.extractedUserList.apply(userList,user),id);
         if(userToFollow!=null)
             user.addFollowing(userToFollow);
-        else System.out.println("User ID not found in record");
+        else System.out.println("You are already following or ID not found in record");
         succeedLogIn(user);
-    }
-
-    //Get list of following-users and follower-users
-    BiFunction<List<User>, User, List<User>> extractedUserList=(users, user) ->{
-        return users.stream().filter(user1 -> !user.equals(user1)&&!user.getFollowings().contains(user1))
-                .distinct().collect(Collectors.toList());
-    };
-
-    private User findByUserId(List<User> users, int id) {
-        return users
-                .stream()
-                .reduce(null, (accum, user) -> user.getUserId() == id ? user : accum);
     }
 
     public static void main(String[] args) {
@@ -327,43 +283,4 @@ public class App {
 
     }
 
-        protected void drawLine() {
-            System.out.println("--------------------------------------------------");
-        }
-
-
-        protected void entryMenuList() {
-            drawLine();
-            int i = 0;
-            for (EntryMenu em : EntryMenu.values()) {
-                System.out.println(Integer.toString(i++) + " >>\t" + em);
-            }
-            drawLine();
-            System.out.print(">>");
-        }
-
-
-        protected void logInMenuList() {
-            drawLine();
-            int startIndex=EntryMenu.values().length - 1;
-            int i = startIndex;
-            for (LoggedInMenu lm : LoggedInMenu.values()) {
-                System.out.println(Integer.toString((i == startIndex) ? 0: i) + " >>\t" + lm);
-                i++;
-            }
-            drawLine();
-            System.out.print(">>");
-        }
-
-        protected void tweetMenuList() {
-            drawLine();
-            int startIndex=EntryMenu.values().length + LoggedInMenu.values().length- 2;
-            int i = startIndex;
-            for (TweetMenu tm : TweetMenu.values()) {
-                System.out.println(Integer.toString((i == startIndex) ? 0 : i) + " >>\t" + tm);
-                i++;
-            }
-            drawLine();
-            System.out.print(">>");
-        }
 }

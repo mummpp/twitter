@@ -25,14 +25,8 @@ public class Reply {
         return date;
     }
 
-    Function<Integer,String> getUserName=id->{
-        return new User().getTweets().stream()
-                .filter(tweet -> tweet.getUserId()==id)
-                .map(tweet ->tweet.getUser().getUserName())
-                .collect(Collectors.toList()).get(0);
-    };
-
     public void print() {
-        System.out.println("\tBy: "+getUserName.apply(userId) +"\n\t  "+ comment +"\n\t  " + date);
+        System.out.println("\tBy: "+UserValidate.findByUserId.apply(App.getUserList(),userId) +
+                "\n\t  "+ comment +"\n\t  " + date);
     }
 }
